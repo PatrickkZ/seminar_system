@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.loha.flippedclassroom.mapper.KlassMapper">
+    <resultMap id="klassMap" type="Klass">
+        <id column="id" property="id"/>
+        <result column="course_id" property="courseId"/>
+        <result column="grade" property="grade"/>
+        <result column="klass_serial" property="klassSerial"/>
+        <result column="klass_time" property="time"/>
+        <result column="klass_location" property="location"/>
+
+        <association property="course" select="com.loha.flippedclassroom.mapper.CourseMapper.selectCourseById" column="course_id"></association>
+    </resultMap>
+
+    <select id="selectKlassByCourseId" parameterType="Long" resultMap="klassMap">
+        select * from klass where course_id=#{value}
+    </select>
+
+    <select id="selectKlassById" parameterType="Long" resultMap="klassMap">
+        select * from klass where id=#{value}
+    </select>
+
+    <select id="selectKlassAndCourseByStudentId" parameterType="Long" resultMap="klassMap">
+        select klass.* from klass,klass_student
+        where student_id=#{values} and klass_id=id
+    </select>
+
+    <select id="selectKlassIdByCourseId" parameterType="Long" resultType="Long">
+        select id from klass where course_id=#{value}
+    </select>
+
+
+
+
+
+
+    <insert id="insertKlass" parameterType="Klass">
+        insert into klass(course_id,grade,klass_serial,klass_time,klass_location)
+        values (#{klass.courseId},#{klass.grade},#{klass.klassSerial},#{klass.time},#{klass.location})
+    </insert>
+
+    <select id="selectKlassId" resultType="Long">
+        select id from klass
+        where course_id=#{courseId} and grade=#{grade} and klass_serial=#{klassSerial}
+    </select>
+
+    <delete id="deleteKlassByKlassId" parameterType="Long">
+
+        delete from klass where id=#{klassId}
+
+    </delete>
+
+</mapper>

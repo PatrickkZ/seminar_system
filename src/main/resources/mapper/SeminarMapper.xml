@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.loha.flippedclassroom.mapper.SeminarMapper">
+    <resultMap id="seminarMap" type="Seminar">
+        <id column="id" property="id"/>
+        <result column="course_id" property="courseId"/>
+        <result column="round_id" property="roundId"/>
+        <result column="seminar_name" property="seminarName"/>
+        <result column="introduction" property="introduction"/>
+        <result column="max_team" property="teamLimit"/>
+        <result column="is_visible" property="isVisible"/>
+        <result column="seminar_serial" property="seminarSerial"/>
+        <result column="enroll_start_time" property="enrollStartTime"/>
+        <result column="enroll_end_time" property="enrollEndTime"/>
+        <association property="course" select="com.loha.flippedclassroom.mapper.CourseMapper.selectCourseById" column="course_id"></association>
+    </resultMap>
+    <select id="selectSeminarByRoundId" parameterType="Long" resultMap="seminarMap">
+        select * from seminar where round_id=#{value} and is_visible=true
+    </select>
+
+    <select id="selectSeminarIdByRoundId" parameterType="Long" resultType="Long">
+        select id from seminar where round_id=#{value} and is_visible=true
+    </select>
+
+    <select id="selectSeminarById" parameterType="Long" resultMap="seminarMap">
+        select * from seminar where id=#{value}
+    </select>
+
+    <select id="selectSeminarIdByCourseId" parameterType="Long" resultType="Long">
+        select id from seminar where course_id=#{value}
+    </select>
+
+    <insert id="insertSeminar" parameterType="Seminar">
+        <selectKey keyProperty="id" order="AFTER" resultType="Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into seminar(course_id,round_id,seminar_name,introduction,max_team,is_visible,seminar_serial,enroll_start_time,enroll_end_time)
+        values (#{courseId},#{roundId},#{seminarName},#{introduction},#{teamLimit},#{isVisible},#{seminarSerial},#{enrollStartTime},#{enrollEndTime})
+    </insert>
+
+
+</mapper>

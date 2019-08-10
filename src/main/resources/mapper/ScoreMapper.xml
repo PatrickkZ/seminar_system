@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.loha.flippedclassroom.mapper.ScoreMapper">
+    <resultMap id="seminarScoreMap" type="SeminarScore">
+        <id column="klass_seminar_id" property="klassSeminarId"/>
+        <id column="team_id" property="teamId"/>
+        <result column="total_score" property="totalScore"/>
+        <result column="presentation_score" property="presentationScore"/>
+        <result column="question_score" property="questionScore"/>
+        <result column="report_score" property="reportScore"/>
+        <association property="team" select="com.loha.flippedclassroom.mapper.TeamMapper.selectTeamById" column="team_id"></association>
+    </resultMap>
+
+    <resultMap id="roundScoreMap" type="RoundScore">
+        <id column="round_id" property="roundId"/>
+        <id column="team_id" property="teamId"/>
+        <result column="total_score" property="totalScore"/>
+        <result column="presentation_score" property="presentationScore"/>
+        <result column="question_score" property="questionScore"/>
+        <result column="report_score" property="reportScore"/>
+        <association property="round" select="com.loha.flippedclassroom.mapper.RoundMapper.selectRoundById" column="round_id"></association>
+        <association property="team" select="com.loha.flippedclassroom.mapper.TeamMapper.selectTeamById" column="team_id"></association>
+    </resultMap>
+    
+    <select id="selectRoundScore" parameterType="RoundScore" resultMap="roundScoreMap">
+        select * from round_score where round_id=#{roundId} and team_id=#{teamId}
+    </select>
+
+    <select id="selectSeminarScore" parameterType="Map" resultMap="seminarScoreMap">
+        select seminar_score.*
+        from seminar_score,klass_seminar
+        where klass_id=#{klassId} and seminar_id=#{seminarId}
+        and id=klass_seminar_id and team_id=#{teamId}
+    </select>
+
+    <select id="selectSeminarScoreByKey" parameterType="SeminarScore" resultMap="seminarScoreMap">
+        select * from seminar_score where klass_seminar_id=#{klassSeminarId} and team_id=#{teamId}
+    </select>
+
+    <update id="updateTeamPreScore" parameterType="SeminarScore">
+        update seminar_score
+        set presentation_score=#{presentationScore}
+        where klass_seminar_id=#{klassSeminarId} and team_id=#{teamId}
+    </update>
+
+    <update id="updateTeamReportScore" parameterType="SeminarScore">
+        update seminar_score
+        set report_score=#{reportScore}
+        where klass_seminar_id=#{klassSeminarId} and team_id=#{teamId}
+    </update>
+
+    <update id="updateTeamTotalScore" parameterType="SeminarScore">
+        update seminar_score
+        set total_score=#{totalScore}
+        where klass_seminar_id=#{klassSeminarId} and team_id=#{teamId}
+    </update>
+
+    <insert id="insertSeminarScore" parameterType="SeminarScore">
+        insert into seminar_score(klass_seminar_id,team_id,question_score)
+        values (#{klassSeminarId},#{teamId},#{questionScore})
+    </insert>
+
+    <update id="updateTeamQuestionScore" parameterType="SeminarScore">
+        update seminar_score
+        set question_score=#{questionScore}
+        where klass_seminar_id=#{klassSeminarId} and team_id=#{teamId}
+    </update>
+
+    <update id="updateSeminarScore" parameterType="SeminarScore">
+        update seminar_score
+        set presentation_score=#{presentationScore},question_score=#{questionScore},report_score=#{reportScore}
+        where klass_seminar_id=#{klassSeminarId} and team_id=#{teamId}
+    </update>
+
+    <insert id="insertRoundScore" parameterType="RoundScore">
+        insert into round_score(round_id,team_id)
+        values (#{roundId},#{teamId})
+    </insert>
+
+    <select id="selectMaxPreScore" resultType="java.math.BigDecimal">
+        select max(presentation_score) from seminar_score
+        where team_id=#{teamId} and
+        klass_seminar_id in
+        <foreach collection="trueKlassSeminarIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectAvgPreScore" resultType="java.math.BigDecimal">
+        select avg(presentation_score) from seminar_score
+        where team_id=#{teamId} and
+        klass_seminar_id in
+        <foreach collection="trueKlassSeminarIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectMaxReportScore" resultType="java.math.BigDecimal">
+        select max(report_score) from seminar_score
+        where team_id=#{teamId} and
+        klass_seminar_id in
+        <foreach collection="trueKlassSeminarIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectAvgReportScore" resultType="java.math.BigDecimal">
+        select avg(report_score) from seminar_score
+        where team_id=#{teamId} and
+        klass_seminar_id in
+        <foreach collection="trueKlassSeminarIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectMaxQuestionScore" resultType="java.math.BigDecimal">
+        select max(question_score) from seminar_score
+        where team_id=#{teamId} and
+        klass_seminar_id in
+        <foreach collection="klassSeminarIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectAvgQuestionScore" resultType="java.math.BigDecimal">
+        select avg(question_score) from seminar_score
+        where team_id=#{teamId} and
+        klass_seminar_id in
+        <foreach collection="klassSeminarIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

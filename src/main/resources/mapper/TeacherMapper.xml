@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.loha.flippedclassroom.mapper.TeacherMapper">
+    <resultMap id="teacherMap" type="Teacher">
+        <id column="id" property="id"/>
+        <result column="account" property="account"/>
+        <result column="password" property="password"/>
+        <result column="teacher_name" property="teacherName"/>
+        <result column="is_active" property="activated"/>
+        <result column="email" property="email"/>
+    </resultMap>
+
+    <select id="selectPwdAndEmailByAccount" parameterType="String" resultType="java.util.Map">
+        select password as password,email as email
+        from teacher
+        where account=#{value}
+    </select>
+
+    <select id="selectTeacherByNum" parameterType="String" resultMap="teacherMap">
+        select * from teacher where account=#{teacherNum}
+    </select>
+
+    <select id="selectTeacherById" parameterType="Long" resultMap="teacherMap">
+        select * from teacher where id=#{value}
+    </select>
+
+    <update id="updatePwdById" parameterType="Teacher">
+        update teacher set password=#{password},is_active=1 where id=#{id}
+    </update>
+
+    <update id="modifyEmailById" parameterType="Teacher">
+        update teacher set email=#{email} where id=#{id}
+    </update>
+
+    <update id="modifyPsdById" parameterType="Teacher">
+        update teacher set password=#{password} where id=#{id}
+    </update>
+
+
+
+</mapper>

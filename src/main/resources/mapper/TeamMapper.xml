@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.loha.flippedclassroom.mapper.TeamMapper">
+    <resultMap id="teamMap" type="Team">
+        <id column="id" property="id"/>
+        <result column="klass_id" property="klassId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="leader_id" property="leaderId"/>
+        <result column="team_name" property="teamName"/>
+        <result column="team_serial" property="teamSerial"/>
+        <result column="status" property="status"/>
+
+        <association property="klass" select="com.loha.flippedclassroom.mapper.KlassMapper.selectKlassById" column="klass_id"></association>
+        <association property="leader" select="com.loha.flippedclassroom.mapper.StudentMapper.selectStudentById" column="leader_id"></association>
+        <!--<collection property="member" ofType="Long" column="id" select="com.loha.flippedclassroom.mapper.StudentMapper.selectStudentById">-->
+        <!--</collection>-->
+    </resultMap>
+
+    <select id="selectTeamById" parameterType="Long" resultMap="teamMap">
+        select * from team where id=#{value}
+    </select>
+
+    <select id="selectTeamByCourseId" parameterType="Long" resultMap="teamMap">
+        select * from team where course_id=#{value}
+    </select>
+
+    <select id="selectTeamByKlassId" parameterType="Long" resultMap="teamMap">
+        select team.* from team,klass_team
+        where klass_team.klass_id=#{value} and team_id=id
+    </select>
+
+    <select id="selectTeamByCourseAndStudentId" parameterType="Map" resultMap="teamMap">
+        select team.* from team,team_student
+        where course_id=#{courseId} and student_id=#{studentId} and team_id=id
+    </select>
+
+    <delete id="deleteMemberInTeam" parameterType="Map">
+        delete from team_student
+        where team_id=#{teamId} and student_id=#{studentId}
+    </delete>
+
+    <insert id="addMemberInTeam" parameterType="Map">
+        insert into team_student
+        values(#{teamId},#{studentId})
+    </insert>
+
+
+    <delete id="deleteTeamById" parameterType="Long">
+        delete from team where id=#{value}
+    </delete>
+
+    <insert id="insertOneTeam" parameterType="Team">
+
+        <selectKey keyProperty="id" order="AFTER" resultType="Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+
+        insert into team(klass_id,course_id,leader_id,team_name,team_serial,status)
+        values(#{klassId},#{courseId},#{leaderId},#{teamName},#{teamSerial},#{status})
+
+    </insert>
+
+    <update id="updateTeamValide" parameterType="Team">
+        update team
+        set status=#{status}
+        where id=#{id}
+    </update>
+
+
+
+
+</mapper>
